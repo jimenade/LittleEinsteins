@@ -4,11 +4,14 @@
 #include <ArduinoJson.h>
 #include <Thread.h>
 
-/*
-  Replace the SSID and Password according to your wifi
-*/
-const char *ssid = "wifieif";
-const char *password = "Goox0sie_WZCGGh25680000";
+#define EAP_ANONYMOUS_IDENTITY "20220719anonymous@urjc.es" // leave as it is
+#define EAP_IDENTITY "j.delatorre.2020@alumnos.urjc.es"    // Use your URJC email
+#define EAP_PASSWORD "Pompas y yo 2002"            // User your URJC password
+#define EAP_USERNAME "j.delatorre.2020@alumnos.urjc.es"    // Use your URJC email
+
+//SSID NAME
+const char* ssid = "eduroam"; // eduroam SSID
+
 
 // Your MQTT broker ID
 const char *mqttBroker = "193.147.53.2";
@@ -29,32 +32,27 @@ unsigned long lastMsg = 0;
 const int READ_CYCLE_TIME = 3000;
 
 int start_time;
+Thread myThread = Thread();
 Thread sendThread = Thread();
 // int ping_time;
 
 void setupWifi()
 {
   delay(10);
-
-  Serial.println(F("Adafruit MQTT demo"));
-
-  // Connect to WiFi access point.
-  Serial.println();
-  Serial.println();
-  Serial.print("Connecting to ");
+  Serial.print(F("Connecting to network: "));
   Serial.println(ssid);
+  WiFi.disconnect(true); 
 
-  WiFi.begin(ssid, password);
-  while (WiFi.status() != WL_CONNECTED)
-  {
+  WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); 
+
+  while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    Serial.print(F("."));
   }
-  Serial.println();
-
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("");
+  Serial.println(F("WiFi is connected!"));
+  Serial.println(F("IP address set: "));
+  Serial.println(WiFi.localIP()); //print LAN IP
 }
 
 // Function to connect and reconnect as necessary to the MQTT server.
@@ -108,6 +106,8 @@ void start_lap(){
   messages.publish(jsonString.c_str());
 
   start_time = millis();
+
+  Serial.println("start_lap enviado");
 }
 
 void end_lap(){
@@ -161,6 +161,7 @@ void line_lost(){
 }
 
 void send_ping(){
+  //Serial.println("entra en ping");
   int ping_time = millis();
   StaticJsonDocument<200> jsonDoc;
 
@@ -175,6 +176,7 @@ void send_ping(){
   String jsonString;
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
+  Serial.println("Ping enviado");
 
 }
 
@@ -240,12 +242,9 @@ void visible_line(float value){
 
 void setup()
 {
-  // Set Serial Monitor Baud rate
   Serial.begin(115200);
-  // Configure LED
-  // pinMode(LED_BUILTIN, OUTPUT);
-  // Connect to Wifi
   setupWifi();
+
   connectToMQTTServer();
   start_time = 0;
   sendThread.enabled = true;
@@ -258,6 +257,8 @@ void setup()
 
 void loop()
 {
+  if(sendThread.shouldRun())
+    sendThread.run();
   // Connect to MQTT
   //connectToMQTTServer();
 
@@ -270,4 +271,7 @@ void loop()
   // {
   //   mqtt.disconnect();
   // }
+  yield();
 }
+
+
