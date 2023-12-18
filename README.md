@@ -7,6 +7,42 @@ Our project centers around the development of a car designed to complete a lap i
 
 ![image](https://github.com/jimenade/LittleEinsteins/assets/102520569/9c37c49c-debd-4c01-af90-a26d0875e3e9)
 
+## ESP-32:
+We employ the ESP-32 microcontroller to establish a Wi-Fi connection between the robot and a server, facilitating MQTT communication. The network utilized for this connection is an educational network associated with one of our designated accounts. Below is an illustrative example of the code structure, with placeholder data for confidentiality:
+```cpp
+#include <WiFi.h>
+
+#define EAP_ANONYMOUS_IDENTITY "20220719anonymous@urjc.es" // leave as it is
+#define EAP_IDENTITY "name@alumnos.urjc.es"    // Use your URJC email
+#define EAP_PASSWORD "password"            // User your URJC password
+#define EAP_USERNAME "name@alumnos.urjc.es"    // Use your URJC email
+
+//SSID NAME
+const char* ssid = "eduroam"; // eduroam SSID
+
+WiFiClient client;
+
+void setupWifi()
+{
+  delay(10);
+  Serial.print(F("Connecting to network: "));
+  Serial.println(ssid);
+  WiFi.disconnect(true); 
+
+  WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); 
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(F("."));
+  }
+  Serial.println("");
+  Serial.println(F("WiFi is connected!"));
+  Serial.println(F("IP address set: "));
+  Serial.println(WiFi.localIP()); //print LAN IP
+}
+
+```
+
 ## MQTT Communication:
 
 To communicate with the MQTT server, we utilize topics, and our designated topic is /SETR/2023/14/. Messages are sent in JSON format, and here's an example message for starting the lap:
