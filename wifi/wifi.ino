@@ -34,7 +34,6 @@ unsigned long lastMsg = 0;
 const int READ_CYCLE_TIME = 3000;
 String buff;
 int start_time;
-// Thread myThread = Thread();
 Thread sendThread = Thread();
 // int ping_time;
 
@@ -99,15 +98,9 @@ void start_lap(){
 
   // Serialize the JSON document to a string
   String jsonString;
-  serializeJson(jsonDoc, jsonString);
-
-  // Publish the JSON payload to an MQTT topic
-  // client.publish(TOPIC, jsonString.c_str());
-  
+  serializeJson(jsonDoc, jsonString); 
 
   messages.publish(jsonString.c_str());
-  // buff = '-1';
-  // Serial2.println(buff);
   start_time = millis();
 
   Serial.println("start_lap enviado");
@@ -154,7 +147,6 @@ void line_lost(){
   jsonDoc["team_name"] = "LittleEinsteins";
   jsonDoc["id"] = "14";
   jsonDoc["action"] = "LINE_LOST";
-  // jsonDoc["distance"] = distance;
 
   // Serialize the JSON document to a string
   String jsonString;
@@ -164,7 +156,6 @@ void line_lost(){
 }
 
 void send_ping(){
-  //Serial.println("entra en ping");
   int ping_time = millis();
   StaticJsonDocument<200> jsonDoc;
 
@@ -190,7 +181,6 @@ void init_line_search(){
   jsonDoc["team_name"] = "LittleEinsteins";
   jsonDoc["id"] = "14";
   jsonDoc["action"] = "INIT_LINE_SEARCH";
-  // jsonDoc["distance"] = distance;
 
   // Serialize the JSON document to a string
   String jsonString;
@@ -205,7 +195,6 @@ void stop_line_search(){
   jsonDoc["team_name"] = "LittleEinsteins";
   jsonDoc["id"] = "14";
   jsonDoc["action"] = "STOP_LINE_SEARCH";
-  // jsonDoc["distance"] = distance;
 
   // Serialize the JSON document to a string
   String jsonString;
@@ -220,7 +209,6 @@ void line_found(){
   jsonDoc["team_name"] = "LittleEinsteins";
   jsonDoc["id"] = "14";
   jsonDoc["action"] = "LINE_FOUND";
-  // jsonDoc["distance"] = distance;
 
   // Serialize the JSON document to a string
   String jsonString;
@@ -262,7 +250,6 @@ void setup()
   sendThread.enabled = true;
   sendThread.setInterval(4000);
   sendThread.onRun(send_ping);
-  // ping_time = start_time;
   
 }
 
@@ -288,11 +275,6 @@ void loop()
       
       
     } 
-    // if (c == '3'){
-      
-    // }
-
-
   }
 
   // Connect to MQTT
@@ -307,5 +289,5 @@ void loop()
   // {
   //   mqtt.disconnect();
   // }
-  yield();
+  // yield();
 }
