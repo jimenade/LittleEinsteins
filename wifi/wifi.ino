@@ -3,6 +3,8 @@
 #include "Adafruit_MQTT_Client.h"
 #include <ArduinoJson.h>
 #include <Thread.h>
+#define RXD2 33
+#define TXD2 4
 
 #define EAP_ANONYMOUS_IDENTITY "20220719anonymous@urjc.es" // leave as it is
 #define EAP_IDENTITY "j.delatorre.2020@alumnos.urjc.es"    // Use your URJC email
@@ -30,9 +32,9 @@ Adafruit_MQTT_Publish messages = Adafruit_MQTT_Publish(&mqtt, publishTopic, MQTT
 
 unsigned long lastMsg = 0;
 const int READ_CYCLE_TIME = 3000;
-
+String buff;
 int start_time;
-Thread myThread = Thread();
+// Thread myThread = Thread();
 Thread sendThread = Thread();
 // int ping_time;
 
@@ -104,7 +106,8 @@ void start_lap(){
   
 
   messages.publish(jsonString.c_str());
-
+  // buff = '-1';
+  // Serial2.println(buff);
   start_time = millis();
 
   Serial.println("start_lap enviado");
@@ -243,14 +246,22 @@ void visible_line(float value){
 void setup()
 {
   Serial.begin(115200);
+  Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
   setupWifi();
 
   connectToMQTTServer();
+  
   start_time = 0;
+  start_lap();
+  Serial2.print("{ 'test': " + String(millis()) + " }");
+  Serial.print("Messase sent! to Arduino");
+  buff = '-1';
+
+  Serial2.println(buff);
+  buff = "";
   sendThread.enabled = true;
   sendThread.setInterval(4000);
   sendThread.onRun(send_ping);
-  start_lap();
   // ping_time = start_time;
   
 }
@@ -259,6 +270,31 @@ void loop()
 {
   if(sendThread.shouldRun())
     sendThread.run();
+
+  if (Serial2.available()) {
+
+    char c = Serial2.read();
+    Serial.println(c);
+
+    buff += c;
+    if (c == '1')  {            
+      //obstacle
+      Serial.println("entra en el if");
+      obstacle_detected(5);
+      end_lap();
+      Serial2.println(buff);
+      buff = "";
+      exit(0);
+      
+      
+    } 
+    // if (c == '3'){
+      
+    // }
+
+
+  }
+
   // Connect to MQTT
   //connectToMQTTServer();
 
@@ -273,5 +309,3 @@ void loop()
   // }
   yield();
 }
-
-
