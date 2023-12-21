@@ -171,7 +171,6 @@ void send_ping(){
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
   Serial.println("Ping enviado");
-
 }
 /*
 void init_line_search(){
@@ -253,7 +252,6 @@ void setup()
   sendThread.enabled = true;
   sendThread.setInterval(4000);
   sendThread.onRun(send_ping);
-  
 }
 
 void loop()
