@@ -7,9 +7,9 @@
 #define TXD2 4
 
 #define EAP_ANONYMOUS_IDENTITY "20220719anonymous@urjc.es" // leave as it is
-#define EAP_IDENTITY "j.delatorre.2020@alumnos.urjc.es"    // Use your URJC email
-#define EAP_PASSWORD "Pompas y yo 2002"            // User your URJC password
-#define EAP_USERNAME "j.delatorre.2020@alumnos.urjc.es"    // Use your URJC email
+#define EAP_IDENTITY "email@alumnos.urjc.es"    // Use your URJC email
+#define EAP_PASSWORD "password"            // User your URJC password
+#define EAP_USERNAME "email@alumnos.urjc.es"    // Use your URJC email
 
 //SSID NAME
 const char* ssid = "eduroam"; // eduroam SSID
