@@ -32,7 +32,7 @@ Adafruit_MQTT_Publish messages = Adafruit_MQTT_Publish(&mqtt, publishTopic, MQTT
 
 unsigned long lastMsg = 0;
 const int READ_CYCLE_TIME = 3000;
-String buff;
+String buff = "";
 int start_time;
 Thread sendThread = Thread();
 // int ping_time;
@@ -109,21 +109,21 @@ void start_lap(){
 void end_lap(){
   int end_time = millis();
   StaticJsonDocument<200> jsonDoc;
-
+  float result = end_time - start_time;
   // Fill the JSON document with data
   jsonDoc["team_name"] = "LittleEinsteins";
   jsonDoc["id"] = "14";
   jsonDoc["action"] = "END_LAP";
-  jsonDoc["time"] = end_time - start_time;
-
-
+  jsonDoc["time"] = result;
+  
   // Serialize the JSON document to a string
   String jsonString;
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
+  exit(0);
 }
 
-void obstacle_detected(float distance){
+void obstacle_detected(int distance){
   
   StaticJsonDocument<200> jsonDoc;
 
@@ -139,7 +139,7 @@ void obstacle_detected(float distance){
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
 }
-
+/*
 void line_lost(){  
   StaticJsonDocument<200> jsonDoc;
 
@@ -154,7 +154,7 @@ void line_lost(){
   messages.publish(jsonString.c_str());
 
 }
-
+*/
 void send_ping(){
   int ping_time = millis();
   StaticJsonDocument<200> jsonDoc;
@@ -173,7 +173,7 @@ void send_ping(){
   Serial.println("Ping enviado");
 
 }
-
+/*
 void init_line_search(){
   StaticJsonDocument<200> jsonDoc;
 
@@ -187,7 +187,8 @@ void init_line_search(){
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
 }
-
+*/
+/*
 void stop_line_search(){
   StaticJsonDocument<200> jsonDoc;
 
@@ -201,7 +202,8 @@ void stop_line_search(){
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
 }
-
+*/
+/*
 void line_found(){
   StaticJsonDocument<200> jsonDoc;
 
@@ -215,7 +217,8 @@ void line_found(){
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
 }
-
+*/
+/*
 void visible_line(float value){
   StaticJsonDocument<200> jsonDoc;
 
@@ -230,7 +233,7 @@ void visible_line(float value){
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
 }
-
+*/
 void setup()
 {
   Serial.begin(115200);
@@ -261,33 +264,21 @@ void loop()
   if (Serial2.available()) {
 
     char c = Serial2.read();
+    int signal = atoi(&c);
     Serial.println(c);
 
     buff += c;
-    if (c == '1')  {            
+    if (signal == 1)  {            
       //obstacle
+
+      char distance = Serial2.parseInt();
       Serial.println("entra en el if");
-      obstacle_detected(5);
+      // int distance_int = atoi(&distance);
+      obstacle_detected(distance);
       end_lap();
       Serial2.println(buff);
       buff = "";
       exit(0);
-      
-      
     } 
   }
-
-  // Connect to MQTT
-  //connectToMQTTServer();
-
-  // this is our 'wait for incoming subscription packets and callback em' busy subloop
-  // try to spend your time here:
-
-  // ping the server to keep the mqtt connection alive
-  // NOT required if you are publishing once every KEEPALIVE seconds
-  // if (!mqtt.ping())
-  // {
-  //   mqtt.disconnect();
-  // }
-  // yield();
 }
