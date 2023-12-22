@@ -6,6 +6,29 @@ Project Overview
 Our project centers around the development of a car designed to complete a lap in a circuit in less than 20 seconds. The programming aspect is implemented using Arduino. Below is an image showcasing our car:
 
 ![image](https://github.com/jimenade/LittleEinsteins/assets/102520569/9c37c49c-debd-4c01-af90-a26d0875e3e9)
+## Moving the car:
+
+To accomplish this aspect of the project, we implemented a Proportional-Integral-Derivative (PID) controller using Arduino. The PID controller is responsible for orchestrating the reading of infrared sensors, interpreting data from the ultrasound sensor to determine distance, and managing the transmission of messages corresponding to each action. This approach ensures precise control over the robot's movements and responses.
+
+Specifically, the PID controller oversees the following functionalities:
+
+- Infrared Sensor Reading:
+  
+  The PID controller tasks the reading of infrared sensors, which play a crucial role in line following and detection. By continuously monitoring the input from these sensors, the controller makes real-time decisions to keep the robot aligned with the desired path.
+
+- Ultrasound Sensor for Distance Measurement:
+  
+  The ultrasound sensor is utilized to measure the distance between the robot and surrounding obstacles. The PID controller incorporates this distance data into its decision-making process, enabling the robot to navigate effectively and avoid collisions.
+  
+- Message Transmission:
+
+  The PID controller is responsible for sending messages corresponding to each action undertaken by the robot. These messages include critical information about the robot's state and actions, such as starting and ending a lap, detecting obstacles, and other relevant events.
+
+- Line Tracking Management:
+  
+  Notably, our robot is designed to operate without losing the tracking line. While we do not have a recovery plan for scenarios involving line loss, the PID controller is adept at minimizing the chances of such occurrences. Additionally, the controller handles messages related to the robot's line-tracking status, including detecting the line, losing the line, and reporting the percentage of the line visible.
+
+By incorporating the PID controller into our project, we ensure a robust and adaptive control system that enhances the precision and reliability of our robot's navigation and interaction with its environment. This comprehensive approach contributes to the overall success and efficiency of our project.
 
 ## ESP-32:
 We employ the ESP-32 microcontroller to establish a Wi-Fi connection between the robot and a server, facilitating MQTT communication. The network utilized for this connection is an educational network associated with one of our designated accounts. Below is an illustrative example of the code structure, with placeholder data for confidentiality:
