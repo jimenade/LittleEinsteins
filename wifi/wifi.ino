@@ -120,7 +120,10 @@ void end_lap(){
   String jsonString;
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
-  exit(0);
+  while(true){
+    //Bucle para que no envie mas mensajes
+    delay(2000); 
+  }
 }
 
 void obstacle_detected(int distance){
@@ -139,22 +142,7 @@ void obstacle_detected(int distance){
   serializeJson(jsonDoc, jsonString);
   messages.publish(jsonString.c_str());
 }
-/*
-void line_lost(){  
-  StaticJsonDocument<200> jsonDoc;
 
-  // Fill the JSON document with data
-  jsonDoc["team_name"] = "LittleEinsteins";
-  jsonDoc["id"] = "14";
-  jsonDoc["action"] = "LINE_LOST";
-
-  // Serialize the JSON document to a string
-  String jsonString;
-  serializeJson(jsonDoc, jsonString);
-  messages.publish(jsonString.c_str());
-
-}
-*/
 void send_ping(){
   int ping_time = millis();
   StaticJsonDocument<200> jsonDoc;
@@ -172,67 +160,7 @@ void send_ping(){
   messages.publish(jsonString.c_str());
   Serial.println("Ping enviado");
 }
-/*
-void init_line_search(){
-  StaticJsonDocument<200> jsonDoc;
 
-  // Fill the JSON document with data
-  jsonDoc["team_name"] = "LittleEinsteins";
-  jsonDoc["id"] = "14";
-  jsonDoc["action"] = "INIT_LINE_SEARCH";
-
-  // Serialize the JSON document to a string
-  String jsonString;
-  serializeJson(jsonDoc, jsonString);
-  messages.publish(jsonString.c_str());
-}
-*/
-/*
-void stop_line_search(){
-  StaticJsonDocument<200> jsonDoc;
-
-  // Fill the JSON document with data
-  jsonDoc["team_name"] = "LittleEinsteins";
-  jsonDoc["id"] = "14";
-  jsonDoc["action"] = "STOP_LINE_SEARCH";
-
-  // Serialize the JSON document to a string
-  String jsonString;
-  serializeJson(jsonDoc, jsonString);
-  messages.publish(jsonString.c_str());
-}
-*/
-/*
-void line_found(){
-  StaticJsonDocument<200> jsonDoc;
-
-  // Fill the JSON document with data
-  jsonDoc["team_name"] = "LittleEinsteins";
-  jsonDoc["id"] = "14";
-  jsonDoc["action"] = "LINE_FOUND";
-
-  // Serialize the JSON document to a string
-  String jsonString;
-  serializeJson(jsonDoc, jsonString);
-  messages.publish(jsonString.c_str());
-}
-*/
-/*
-void visible_line(float value){
-  StaticJsonDocument<200> jsonDoc;
-
-  // Fill the JSON document with data
-  jsonDoc["team_name"] = "LittleEinsteins";
-  jsonDoc["id"] = "14";
-  jsonDoc["action"] = "VISIBE_LINE";
-  jsonDoc["value"] = value;
-
-  // Serialize the JSON document to a string
-  String jsonString;
-  serializeJson(jsonDoc, jsonString);
-  messages.publish(jsonString.c_str());
-}
-*/
 void setup()
 {
   Serial.begin(115200);
@@ -269,14 +197,15 @@ void loop()
     if (signal == 1)  {            
       //obstacle
 
-      char distance = Serial2.parseInt();
+      char distance = Serial2.read();
+      int dist_int = atoi(&distance);
+
       Serial.println("entra en el if");
       // int distance_int = atoi(&distance);
-      obstacle_detected(distance);
+      obstacle_detected(dist_int);
       end_lap();
       Serial2.println(buff);
       buff = "";
-      exit(0);
     } 
   }
 }
