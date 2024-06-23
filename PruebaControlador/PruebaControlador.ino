@@ -1,4 +1,4 @@
-//#include <Arduino_FreeRTOS.h>
+#include <Arduino_FreeRTOS.h>
 //#include <PIDController.hpp>
 
 #include <Arduino.h>
@@ -37,7 +37,7 @@ uint32_t Color(uint8_t r, uint8_t g, uint8_t b)
 #define LEFT_OK 800
 #define RIGHT_OK 800
 #define MIDDLE_OK 915
-#define baseSpeed 125
+#define baseSpeed 74
 
 volatile int distance; 
 volatile long output; 
@@ -47,9 +47,9 @@ volatile long middle;
 volatile long right; 
 volatile double error_total = 0; 
 // Constantes del controlador
-double Kp=0.062637;//0.05722 //0.074
-double Kd=0.01814;//0.011 //0.0201
-double Ki= 0.0000;//0.0004
+double Kp=0.0628;//0.05722 //0.074
+double Kd=0.014;//0.011 //0.0201
+double Ki= 0.00000;//0.0004
 String sendBuff = "";
 // Crear el controlador PID
 //PIDController pid(Kp, Ki, Kd);
@@ -116,7 +116,7 @@ void setup() {
 void loop() {
   
   calcularDistancia();
-  if(distance < 8){
+  if(distance < 10){
     digitalWrite(PIN_Motor_STBY, LOW);
     if (Serial.available()) {
       calcularDistancia();
@@ -202,15 +202,15 @@ else {
 
 }
 
-// void TaskPing(void *pvParameters) {
-//   TickType_t xLastWakeTime, aux;
-//   while(1){
-//     left = analogRead(LEFT);
-//     middle = analogRead(MIDDLE);
-//     right = analogRead(RIGHT);
-//   }
-//   xTaskDelayUntil( &xLastWakeTime, 100 );
-// }
+void TaskPing(void *pvParameters) {
+  TickType_t xLastWakeTime, aux;
+  while(1){
+    left = analogRead(LEFT);
+    middle = analogRead(MIDDLE);
+    right = analogRead(RIGHT);
+  }
+  xTaskDelayUntil( &xLastWakeTime, 100 );
+}
 void calcularDistancia(){
   long t; //timepo que demora en llegar el eco
   
@@ -242,91 +242,91 @@ void calcularDistancia(){
 
 
 
-// void TaskComputePID(void *pvParameters) {
-//   TickType_t xLastWakeTime, aux;
-//   while(1){
-//     calcularDistancia();
-//     if(distance < 8){
-//       digitalWrite(PIN_Motor_STBY, LOW);
-//       if (Serial.available()) {
+void TaskComputePID(void *pvParameters) {
+  TickType_t xLastWakeTime, aux;
+  while(1){
+    calcularDistancia();
+    if(distance < 8){
+      digitalWrite(PIN_Motor_STBY, LOW);
+      if (Serial.available()) {
 
         
-//         Serial.println(1);
-//         delay(1000);
+        Serial.println(1);
+        delay(1000);
         
         
 
-//       }
-//       exit(0);
-//     }
-//     else{
+      }
+      exit(0);
+    }
+    else{
 
-//       // // Leer los valores de los sensores
-//       int left = analogRead(LEFT);
-//       int middle = analogRead(MIDDLE);
-//       int right = analogRead(RIGHT);
-//       // if (middle < 60){
-//       //   output = (-1* output) + 10;
-//       // }
-//       // else{
-//         // Calcular la posición de la línea
-//       double posicion = -1 * left + 1 * right;
-//       double error_central = 800 - middle;
-//       if (error_central < 0){
-//         error_central = 0; 
-//       }
-//       // Calcular el error
-//       double error_lateral = 0 - posicion;
-//       if (error_lateral < 0){
-//         error_total = error_lateral - error_central;
-//       }
-//       if (error_lateral >= 0){
-//         error_total = error_lateral + error_central;
-//       }
+      // // Leer los valores de los sensores
+      int left = analogRead(LEFT);
+      int middle = analogRead(MIDDLE);
+      int right = analogRead(RIGHT);
+      // if (middle < 60){
+      //   output = (-1* output) + 10;
+      // }
+      // else{
+        // Calcular la posición de la línea
+      double posicion = -1 * left + 1 * right;
+      double error_central = 800 - middle;
+      if (error_central < 0){
+        error_central = 0; 
+      }
+      // Calcular el error
+      double error_lateral = 0 - posicion;
+      if (error_lateral < 0){
+        error_total = error_lateral - error_central;
+      }
+      if (error_lateral >= 0){
+        error_total = error_lateral + error_central;
+      }
       
-//       integral += error_total;
-//       double derivative = error_total - lastError;
+      integral += error_total;
+      double derivative = error_total - lastError;
 
-//       // if (-20<= error <= 20 ){
+      // if (-20<= error <= 20 ){
         
-//       //   output = 0; 
-//       // }
-//       // if (error > 20){
+      //   output = 0; 
+      // }
+      // if (error > 20){
        
-//       //   // Calcular la salida del controlador PID
-//       //   //double output = Kp * error + Ki * integral + Kd * derivative;
-//       //   output = Kp * error + + Kd * derivative;
-//       //   // Guardar el error actual para la próxima iteración
-//       //   lastError = error;
-//       // }
-//       // if (error < -20){
+      //   // Calcular la salida del controlador PID
+      //   //double output = Kp * error + Ki * integral + Kd * derivative;
+      //   output = Kp * error + + Kd * derivative;
+      //   // Guardar el error actual para la próxima iteración
+      //   lastError = error;
+      // }
+      // if (error < -20){
        
-//       //   // Calcular la salida del controlador PID
-//       //   //double output = Kp * error + Ki * integral + Kd * derivative;
-//       //   output = Kp * error + + Kd * derivative;
-//       //   // Guardar el error actual para la próxima iteración
-//       //   lastError = error;
-//       // }
-//       output = Kp * error_total + + Ki * integral + Kd * derivative;
-//       //   // Guardar el error actual para la próxima iteración
-//       lastError = error_total;
+      //   // Calcular la salida del controlador PID
+      //   //double output = Kp * error + Ki * integral + Kd * derivative;
+      //   output = Kp * error + + Kd * derivative;
+      //   // Guardar el error actual para la próxima iteración
+      //   lastError = error;
+      // }
+      output = Kp * error_total + + Ki * integral + Kd * derivative;
+      //   // Guardar el error actual para la próxima iteración
+      lastError = error_total;
    
-//       int speedRight = baseSpeed + output;
-//       int speedLeft = baseSpeed - output;
+      int speedRight = baseSpeed + output;
+      int speedLeft = baseSpeed - output;
       
 
-//       speedRight = max(speedRight, 0);
-//       speedLeft = max(speedLeft, 0);
+      speedRight = max(speedRight, 0);
+      speedLeft = max(speedLeft, 0);
       
-//       digitalWrite(PIN_Motor_STBY, HIGH);
-//       digitalWrite(PIN_Motor_AIN_1, HIGH);
-//       digitalWrite(PIN_Motor_BIN_1, HIGH);
-//       analogWrite(PIN_Motor_PWMA, speedRight);
-//       analogWrite(PIN_Motor_PWMB, speedLeft);
-//     }
-//     xTaskDelayUntil( &xLastWakeTime, 50 );
-//   }
+      digitalWrite(PIN_Motor_STBY, HIGH);
+      digitalWrite(PIN_Motor_AIN_1, HIGH);
+      digitalWrite(PIN_Motor_BIN_1, HIGH);
+      analogWrite(PIN_Motor_PWMA, speedRight);
+      analogWrite(PIN_Motor_PWMB, speedLeft);
+    }
+    xTaskDelayUntil( &xLastWakeTime, 50 );
+  }
   
   
   
-// }
+}
